@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">  <title>3D Builder Teszt</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        #console { background: #eee; padding: 10px; border: 1px solid #ccc; height: 200px; overflow-y: scroll; }
+        #state { margin-top: 20px; padding: 10px; border: 1px solid #333; background: #f9f9f9; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+<h2>🛠️ 3D Builder Backend Teszt</h2>
+
+<div>
+    <input type="text" id="commandInput" placeholder="Pl: AddPoint(10, 5, 0)" style="width: 300px; padding: 5px;">
+    <button onclick="sendCommand()">Küldés</button>
+</div>
+
+<h3>Szerver válasza (A világ állapota):</h3>
+<pre id="state">Még nincs adat...</pre>
+
+<h3>Log:</h3>
+<div id="console"></div>
+
+<script>
+    var stompClient = null;
+
+    function connect() {
+        // Itt csatlakozunk a Backendben megadott "/3d-ws" végponthoz
+        var socket = new SockJS('/3d-ws');
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function (frame) {
+            log("✅ Csatlakozva: " + frame);
+
+            // Feliratkozunk a válaszokra (/topic/world-updates)
+            stompClient.subscribe('/topic/world-updates', function (response) {
+                showState(JSON.parse(response.body));
+            });
+        }, function(error) {
+            log("❌ Hiba: " + error, "error");
+        });
+    }
+
+    function sendCommand() {
+        var command = document.getElementById('commandInput').value;
+        if(command) {
+            // Elküldjük a parancsot a Controllernek (/app/send-command)
+            stompClient.send("/app/send-command", {}, command);
+            log("Küldve: " + command);
+            document.getElementById('commandInput').value = ''; // Töröljük a mezőt
+        }
+    }
+
+    function showState(points) {
+        // Szépen formázva kiírjuk a kapott JSON-t
+        document.getElementById('state').innerHTML = JSON.stringify(points, null, 4);
+        log("Friss állapot érkezett (" + points.length + " pont)");
+    }
+
+    function log(message, type) {
+        var consoleDiv = document.getElementById('console');
+        var p = document.createElement('p');
+        p.style.wordWrap = 'break-word';
+        p.className = type || "";
+        p.appendChild(document.createTextNode(new Date().toLocaleTimeString() + " - " + message));
+        consoleDiv.insertBefore(p, consoleDiv.firstChild);
+    }
+
+    // Az oldal betöltésekor azonnal csatlakozunk
+    connect();
+</script>
+</body>
+</html>

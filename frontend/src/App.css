@@ -1,0 +1,1007 @@
+  /* =========================================
+     1. ALAP BEÁLLÍTÁSOK (RESET)
+     ========================================= */
+  * {
+    box-sizing: border-box; /* FONTOS: Ez javítja a méretezési hibákat */
+  }
+
+  #root {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+  }
+
+  body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Ez megakadályozza, hogy az egész oldal elmozduljon */
+  }
+
+  /* =========================================
+     2. BAL ALSÓ GOMBSOR (Eszközök)
+     ========================================= */
+  .left-icon-bar {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    display: flex;
+    gap: 10px;
+    z-index: 1000;
+  }
+
+  .icon-btn {
+    width: 40px;
+    height: 40px;
+    background-color: #000;
+    border: 1px solid #444;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  }
+
+  .icon-btn:hover {
+    background-color: #222;
+    border-color: #888;
+    transform: translateY(-2px);
+  }
+
+  .btn-svg-icon {
+    width: 22px;
+    height: 22px;
+    fill: #ffffff;
+  }
+
+  /* =========================================
+     3. BAL FELSŐ UNDO/REDO
+     ========================================= */
+  .undo-redo-container {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    gap: 10px;
+    z-index: 1000;
+  }
+
+  .icon-btn-small {
+    width: 40px;
+    height: 40px;
+    background-color: #000;
+    border: 1px solid #444;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: all 0.2s;
+  }
+
+  .icon-btn-small:hover {
+    background-color: #222;
+    border-color: #888;
+    transform: translateY(-1px);
+  }
+
+  .icon-btn-small svg { display: block; }
+
+  /* =========================================
+     4. TIMELINE (DAW STÍLUS - KÖZÉP FENT)
+     ========================================= */
+  .timeline-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    min-width: 500px;
+    max-height: 250px;
+    background-color: #111;
+    border: 1px solid #444;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    z-index: 900;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+    overflow: visible; /* Hogy a tooltip kilógjon */
+  }
+
+  /* FELSŐ RÉSZ: Vezérlők */
+  .timeline-header {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #000;
+    border-bottom: 1px solid #333;
+    height: 40px;
+    flex-shrink: 0;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+
+    /* JAVÍTÁS: Pontos igazítás a sávokhoz */
+    /* 60px (label) + 10px (padding) = 70px */
+    padding-left: 70px;
+  }
+
+  .timeline-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: 15px;
+  }
+
+  .timeline-btn {
+    background-color: #000;
+    border: 1px solid #555;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 4px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .timeline-btn:hover { background-color: #333; border-color: #888; }
+  .timeline-btn.active {
+    background-color: #333;
+    border-color: #fff;
+    color: #fff;
+  }
+  .timeline-btn.stop:hover { background-color: #300; border-color: #f44; }
+
+  .time-display {
+    color: #ffffff;
+    font-family: monospace;
+    font-size: 1rem;
+    min-width: 50px;
+    text-align: right;
+    user-select: none;
+    font-weight: bold;
+  }
+
+  .timeline-scrubber-track {
+    flex-grow: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    /* A csúszka margója, hogy ne érjen össze a gombokkal */
+    padding-right: 10px;
+  }
+
+  .timeline-slider {
+    width: 100%;
+    cursor: pointer;
+    height: 6px;
+    background: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+    display: block;
+    margin: 0;
+  }
+  .timeline-slider::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 6px;
+    background: #ffffff;
+    border-radius: 3px;
+    border: 1px solid #888;
+  }
+  .timeline-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 18px;
+    width: 18px;
+    border-radius: 50%;
+    background: #000000;
+    border: 2px solid #ffffff;
+    margin-top: -7px; /* Középre igazítás */
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+  }
+
+  /* ALSÓ RÉSZ: Sávok (Tracks) */
+  .timeline-tracks-area {
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0;
+    padding-top: 35px;
+
+    /* JAVÍTÁS: Teljesen fekete háttér a sávok alatt */
+    background: #000000;
+    /* A rácsozás maradhat halvány szürke, hogy látszódjon a skála */
+    background-image: linear-gradient(90deg, #222 1px, transparent 1px);
+    background-size: 16.66% 100%;
+    position: relative;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+  .timeline-tracks-area::-webkit-scrollbar { width: 6px; }
+  .timeline-tracks-area::-webkit-scrollbar-track { background: #111; }
+  .timeline-tracks-area::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+
+  /* JAVÍTÁS: Playhead Igazítás */
+  .timeline-playhead {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    /* PONTOSAN 60px, mint a track-label */
+    left: 60px;
+    /* A maradék szélesség */
+    width: calc(100% - 60px);
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  .playhead-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #ff4444;
+    box-shadow: 0 0 5px rgba(255, 68, 68, 0.6);
+    transition: left 0.1s linear;
+  }
+
+  .timeline-track-row {
+    display: flex;
+    height: 30px;
+    margin-bottom: 2px;
+
+    /* JAVÍTÁS: A sávok háttere fekete (vagy nagyon sötét szürke) */
+    background-color: #0a0a0a;
+    border-bottom: 1px solid #222; /* Kis elválasztó vonal */
+    align-items: center;
+  }
+
+  /* JAVÍTÁS: Fix szélesség a címkének */
+  .track-label {
+    width: 60px;     /* Fix 60px */
+    min-width: 60px; /* Fix 60px */
+    color: #888;
+    font-family: monospace;
+    font-size: 12px;
+    padding-left: 5px; /* Kisebb padding */
+    border-right: 1px solid #444;
+    background: #151515;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    z-index: 60;
+    overflow: hidden;
+  }
+
+  .track-content {
+    flex-grow: 1;
+    position: relative;
+    height: 100%;
+  }
+
+  .empty-timeline {
+    text-align: center;
+    color: #555;
+    padding: 10px;
+    font-size: 12px;
+    font-style: italic;
+  }
+
+  /* =========================================
+     5. ABLAKOK KÖZÖS STÍLUSA
+     ========================================= */
+  .ui-overlay, .help-overlay, .color-picker-overlay, .collections-overlay {
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+    color: #fff;
+  }
+
+  /* --- TERMINÁL (JAVÍTVA: LENTRE KÉNYSZERÍTVE) --- */
+  .ui-overlay {
+    position: absolute;
+    top: auto !important;    /* Felülírjuk az esetleges top beállítást */
+    bottom: 20px !important; /* Kényszerítjük az aljára */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    padding: 15px;
+    width: 500px;
+    max-width: 90vw;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .ui-overlay.hidden {
+    transform: translate(-50%, 150%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* --- HELP ABLAK --- */
+  .help-overlay {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2000;
+    padding: 20px;
+    width: 750px;
+    max-width: 95vw;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* --- COLLECTION LISTA ABLAK --- */
+  .collections-overlay {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2000;
+    padding: 20px;
+    width: 500px;
+    max-width: 90vw;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* --- SZÍNVÁLASZTÓ --- */
+  .color-picker-overlay {
+    position: absolute;
+    bottom: 80px;
+    left: 20px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    z-index: 2000;
+  }
+
+  /* =========================================
+     6. EGYÉB BELSŐ ELEMEK
+     ========================================= */
+  .help-scroll-container {
+    overflow-y: auto;
+    flex-grow: 1;
+    padding-right: 10px;
+    margin-top: 10px;
+  }
+  .help-scroll-container::-webkit-scrollbar { width: 6px; }
+  .help-scroll-container::-webkit-scrollbar-track { background: #111; }
+  .help-scroll-container::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
+
+  input {
+    width: 100%;
+    padding: 12px 15px;
+    background-color: transparent;
+    color: #ffffff;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 15px;
+  }
+  input:focus { outline: none; }
+
+  .input-wrapper { position: relative; flex-grow: 1; display: flex; align-items: center; }
+  .terminal-input { position: relative; z-index: 2; background-color: transparent; }
+  .suggestion-ghost {
+    position: absolute; left: 15px;
+    font-family: 'Courier New', monospace; font-size: 15px;
+    color: rgba(255, 255, 255, 0.25);
+    pointer-events: none; z-index: 1; white-space: pre;
+  }
+  .input-bg {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(255, 255, 255, 0.08);
+    border-radius: 8px; z-index: 0;
+  }
+
+  button.send-btn {
+    padding: 10px; background-color: #000; color: #fff;
+    border: 1px solid #444; border-radius: 8px;
+    font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s;
+  }
+  button.send-btn:hover { background-color: #111; border-color: #777; }
+
+  .help-title, .collections-title, .color-picker-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 15px; border-bottom: 1px solid #333;
+    padding-bottom: 10px; font-size: 16px; font-weight: bold; letter-spacing: 1px; width: 100%;
+  }
+  .help-title button, .collections-title button, .close-btn {
+    background-color: #000; color: #fff;
+    border: 1px solid #333; border-radius: 4px;
+    width: 26px; height: 26px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+  }
+  .help-title button:hover, .collections-title button:hover, .close-btn:hover {
+    background-color: #111; border-color: #555;
+  }
+
+  .help-table { width: 100%; border-collapse: collapse; font-size: 13px; font-family: 'Inter', sans-serif; }
+  .help-table th, .help-table td { text-align: left; padding: 12px 10px; border-bottom: 1px solid #222; }
+  .help-table th { color: #888; font-weight: 600; text-transform: uppercase; font-size: 11px;}
+  .help-table td { color: #ddd; }
+  .help-table code { background: #222; border: 1px solid #333; padding: 2px 6px; border-radius: 4px; color: #fff; font-family: monospace; }
+  .use-cmd-btn {
+    background-color: #000; color: #fff; border: 1px solid #555;
+    padding: 6px 12px; border-radius: 4px; cursor: pointer;
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+  }
+  .use-cmd-btn:hover {
+    background-color: #222; /* Kicsit világosabb fekete */
+    color: #fff;            /* A szöveg marad fehér */
+    border-color: #777;     /* A keret kicsit világosabb */
+  }
+
+  .collection-item { background: rgba(255, 255, 255, 0.05); margin-bottom: 8px; padding: 10px; border-radius: 6px; border: 1px solid #222; }
+  .collection-name { font-weight: bold; display: block; margin-bottom: 4px; }
+  .collection-points { font-family: monospace; font-size: 12px; color: #888; }
+  .log { font-family: sans-serif; font-size: 11px; color: #888; text-align: center; margin-bottom: 5px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+  .hex-copy-btn {
+    background-color: #000; color: #ffffff; border: 1px solid #444;
+    padding: 8px 12px; border-radius: 6px; cursor: pointer;
+    font-family: monospace; font-size: 14px; width: 100%;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .hex-copy-btn:hover { background-color: #222; border-color: #fff; }
+  .copy-icon { width: 16px; height: 16px; fill: #888; }
+  .hex-copy-btn:hover .copy-icon { fill: #fff; }
+
+  /* =========================================
+     7. KLIP & TOOLTIP
+     ========================================= */
+  .timeline-clip-block {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    border-radius: 4px;
+    opacity: 0.9;
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    font-size: 10px;
+    padding-left: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow: visible;
+  }
+  .timeline-clip-block:hover { filter: brightness(1.2); z-index: 40; }
+  .clip-name { pointer-events: none; font-weight: bold; text-shadow: 0 1px 2px black; overflow: hidden; text-overflow: ellipsis; }
+
+  .resize-handle { width: 10px; height: 100%; cursor: ew-resize; position: absolute; top: 0; z-index: 20; }
+  .resize-handle.left { left: 0; }
+  .resize-handle.right { right: 0; }
+  .resize-handle:hover { background-color: rgba(255, 255, 255, 0.5); }
+
+  .rename-input { width: 90%; background: transparent; border: none; color: white; font-weight: bold; font-size: 10px; text-align: center; padding: 0; outline: 1px solid #fff; border-radius: 2px; }
+
+  .time-tooltip {
+    position: absolute;
+    top: -30px;
+    background-color: #000;      /* Fekete doboz */
+    border: 1px solid #fff;      /* Fehér keret */
+    color: #ffffff;              /* JAVÍTÁS: Fehér szöveg */
+    font-size: 10px;
+    font-weight: bold;
+    padding: 3px 6px;
+    border-radius: 4px;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 2000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.8);
+  }
+  .time-tooltip.start { left: -10px; }
+  .time-tooltip.end { right: -10px; }
+
+  /* ... a meglévő timeline-clip-block beállítások ... */
+
+  .timeline-clip-block {
+    /* ... (position, top, border-radius, stb marad) ... */
+
+    /* JAVÍTÁS: Alap kurzor legyen a nyitott kéz */
+    cursor: grab;
+  }
+
+  /* Amikor épp húzod (React state adja hozzá a class-t) */
+  .timeline-clip-block.dragging {
+    cursor: grabbing !important;
+    opacity: 1; /* Legyen teljesen látható */
+    z-index: 100; /* Legyen minden felett */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.8); /* Nagyobb árnyék */
+    border-color: #fff;
+  }
+
+  /* Ha az input aktív, akkor szövegkurzor */
+  .timeline-clip-block input {
+    cursor: text;
+  }
+
+  /* --- TÖRLÉS GOMB (X) --- */
+  .delete-clip-btn {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 16px;
+    height: 16px;
+
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.5);
+    border-radius: 50%; /* Kör alakú */
+
+    font-size: 10px;
+    line-height: 1;
+    font-weight: bold;
+
+    display: none; /* Alapból rejtve */
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 100; /* Legyen legfelül */
+    padding: 0;
+  }
+
+  /* Ha ráviszed az egeret a klipre, megjelenik a gomb */
+  .timeline-clip-block:hover .delete-clip-btn {
+    display: flex;
+  }
+
+  .delete-clip-btn:hover {
+    background-color: #ff4444; /* Pirosra vált hoverkor */
+    border-color: #fff;
+  }
+
+  /* =========================================
+     8. PONT TÁBLÁZAT (POINT EDITOR)
+     ========================================= */
+
+  .point-table-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2000;
+    padding: 20px;
+    width: 600px;
+    max-width: 90vw;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+    color: #fff;
+  }
+
+  /* =========================================
+     8. PONT TÁBLÁZAT (POINT EDITOR)
+     ========================================= */
+
+  .point-table-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2000;
+    padding: 20px;
+    width: 600px;
+    max-width: 90vw;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+    color: #fff;
+  }
+
+  .point-table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 1px;
+  }
+
+  .point-table-scroll {
+    overflow-y: auto;
+    flex-grow: 1;
+    padding-right: 5px;
+  }
+  .point-table-scroll::-webkit-scrollbar { width: 6px; }
+  .point-table-scroll::-webkit-scrollbar-track { background: #111; }
+  .point-table-scroll::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
+
+  .styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+  }
+
+  .styled-table th {
+    text-align: left;
+    padding: 8px;
+    color: #888;
+    border-bottom: 1px solid #444;
+    font-weight: 600;
+  }
+
+  .styled-table td {
+    padding: 6px;
+    border-bottom: 1px solid #222;
+    vertical-align: middle;
+    color: #ffffff; /* Szöveg színe fehér */
+  }
+
+  /* Koordináta Inputok */
+  .coord-input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #444; /* Sötétszürke keret */
+    color: #ffffff;         /* Fehér szöveg */
+    padding: 4px 6px;
+    border-radius: 4px;
+    width: 60px;
+    font-family: monospace;
+    text-align: right;
+    transition: all 0.2s;
+  }
+
+  /* Focus állapot (kattintáskor) - Nincs zöld */
+  .coord-input:focus {
+    outline: none;
+    border-color: #888;     /* Világosabb szürke */
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Törlés gomb a táblázatban (Fekete) */
+  .table-delete-btn {
+    background: #000;       /* Fekete háttér */
+    border: 1px solid #444;
+    color: #fff;            /* Fehér X */
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    transition: all 0.2s;
+  }
+
+  .table-delete-btn:hover {
+    background: #222;       /* Hoverre kicsit világosabb fekete */
+    border-color: #666;
+  }
+
+  /* Sötét Görgetősáv */
+  .dark-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .dark-scrollbar::-webkit-scrollbar-track {
+    background: #222; /* Sötét háttér */
+    border-radius: 4px;
+  }
+
+  .dark-scrollbar::-webkit-scrollbar-thumb {
+    background: #444; /* Sötétszürke "csúszka" */
+    border-radius: 4px;
+  }
+
+  .dark-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Kicsit világosabb, ha fölé viszed az egeret */
+  }
+
+
+
+  /* =========================================
+     9. REACT-COLOR CHROMEPICKER SÖTÉT TÉMA
+     ========================================= */
+
+  /* A fő tároló doboz háttere (ami eddig fehér volt) */
+  .chrome-picker {
+    background-color: #222 !important; /* Sötétszürke háttér */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5) !important; /* Sötétebb árnyék */
+    border: 1px solid #444 !important; /* Vékony sötét keret */
+  }
+
+  /* A felső szaturációs rész alatti vezérlő terület (ahol az inputok vannak) */
+  .chrome-picker > div:last-child {
+    background-color: #222 !important;
+  }
+  /* A beviteli mezők (RGB számok) */
+  .chrome-picker input {
+    background-color: #333 !important; /* Sötétebb háttér a mezőknek */
+    color: #fff !important;            /* Fehér számok */
+    box-shadow: none !important;       /* Belső árnyék eltüntetése */
+    border: 1px solid #555 !important; /* Sötét keret */
+    font-family: monospace;
+  }
+
+  /* A mezők alatti címkék (R, G, B, HEX) */
+  .chrome-picker span {
+    color: #aaa !important; /* Világosszürke betűk */
+    font-weight: bold;
+  }
+
+  /* A kis pipetta ikon színe */
+  .chrome-picker svg {
+    fill: #aaa !important;
+  }
+  .chrome-picker svg:hover {
+    fill: #fff !important;
+  }
+
+  /* Az elválasztó vonalak eltüntetése vagy sötétítése */
+  .flexbox-fix {
+    border-top: none !important;
+  }
+
+  /* Points Editor alsó sávja */
+  .point-table-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px 0 5px 0;
+    border-top: 1px solid #333;
+    margin-top: 10px;
+  }
+
+  /* A kör alakú plusz gomb */
+  .add-point-inline-btn {
+    background-color: #1a1a1a;
+    border: 1px solid #444;
+    color: white;
+    width: 36px;   /* Fix szélesség */
+    height: 36px;  /* Fix magasság, így négyzet lesz */
+    border-radius: 6px; /* KÖR HELYETT LEKEREKÍTETT NÉGYZET */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+
+  .add-point-inline-btn:hover {
+    background-color: #333;
+    border-color: #fff;
+    transform: translateY(-2px); /* Kicsit emelkedjen meg hoverkor */
+  }
+
+  .add-point-inline-btn svg {
+    display: block;
+    /* Opcionális: ha vastagabb plusz jelet akarsz, itt növelheted a strokeWidth-et az SVG-ben */
+  }
+
+
+  /* A táblázatban lévő natív színválasztó (input type="color") stílusa */
+  input[type="color"] {
+    -webkit-appearance: none;
+    border: 1px solid #444 !important; /* Sötétszürke keret */
+    background-color: #1a1a1a !important; /* Fekete háttér */
+    border-radius: 4px;
+    inline-size: 24px;
+    block-size: 24px;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  /* Ez tünteti el a fehér belső keretet Chrome/Edge alatt */
+  input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+
+  input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 3px;
+    /* Itt nem állítunk be színt, mert azt a React 'value' propja adja */
+  }
+
+  /* Firefox specifikus rész */
+  input[type="color"]::-moz-color-swatch {
+    border: none;
+    border-radius: 3px;
+  }
+
+
+  /* A Points Editor táblázatában lévő színválasztó dobozok stílusa */
+  .styled-table input[type="color"] {
+    -webkit-appearance: none;
+    border: 1px solid #444 !important; /* Sötét keret */
+    background-color: #1a1a1a !important; /* Fekete háttér */
+    inline-size: 24px;
+    block-size: 24px;
+    padding: 0;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  /* Eltávolítja a fehér belső keretet Chrome/Edge alatt */
+  .styled-table input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+
+  .styled-table input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 3px;
+  }
+
+  /* Firefox javítás */
+  .styled-table input[type="color"]::-moz-color-swatch {
+    border: none;
+    border-radius: 3px;
+  }
+
+
+  /* --- SIMPLE BUILDING NOTIFICATION --- */
+
+  .building-notification {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    /* Sötét háttér */
+    background: rgba(0, 0, 0, 0.9);
+
+    /* VILÁGOS, FÉNYES KERET (Statikus) */
+    border: 2px solid #ffffff;  /* Itt állítsd be a színedet! */
+
+    /* Opcionális: Egy kis fix ragyogás, hogy "világítson", de ne mozogjon */
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.4);
+
+    border-radius: 50px;
+    padding: 12px 30px;
+    z-index: 1500;
+    pointer-events: none;
+    text-align: center;
+
+    /* Csak egyszer úszik be, utána megáll */
+    animation: slideDown 0.3s ease-out;
+  }
+
+  .building-content {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+
+  .building-subtext {
+    font-size: 0.75rem;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+
+  /* Beúszás fentről (ez maradhat, mert szebb, ha nem csak "megjelenik") */
+  @keyframes slideDown {
+    from { top: -20px; opacity: 0; }
+    to { top: 80px; opacity: 1; }
+  }
+  /* --- MOZGATHATÓ ABLAKOK KÖZÖS STÍLUSA --- */
+
+  .draggable-window {
+    position: absolute;
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Hogy a lekerekítés megmaradjon */
+  }
+
+  /* Fejléc (Drag Handle) */
+  .window-header {
+    background-color: #1a1a1a;
+    border-bottom: 1px solid #333;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: grab; /* Kéz ikon */
+    user-select: none;
+  }
+
+  .window-header:active {
+    cursor: grabbing; /* Zárt kéz mozgatáskor */
+    background-color: #222;
+  }
+
+  .window-title {
+    font-weight: bold;
+    color: #ddd;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* Gombok (Minimize, Close) */
+  .window-controls {
+    display: flex;
+    gap: 8px;
+  }
+
+  .window-btn {
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+    color: white;
+  }
+
+  .window-btn.minimize {
+    background-color: #333;
+    font-size: 14px;
+    line-height: 0; /* Hogy a mínusz jel középen legyen */
+  }
+
+  .window-btn.minimize:hover {
+    background-color: #555;
+  }
+
+  .window-btn.close {
+    background-color: #333; /* Vagy sötétpiros: #500 */
+    font-size: 12px;
+  }
+
+  .window-btn.close:hover {
+    background-color: #d32f2f; /* Piros hover */
+  }
+
+  /* Tartalom */
+  .window-content-wrapper {
+    padding: 10px;
+    color: #fff;
+    /* Ha az ablak tartalma túl nagy, görgethető legyen */
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  /* A Scrollbarok sötétítése a belső tartalomnál */
+  .window-content-wrapper::-webkit-scrollbar { width: 6px; }
+  .window-content-wrapper::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
